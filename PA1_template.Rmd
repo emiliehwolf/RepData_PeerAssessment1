@@ -1,5 +1,7 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "Emilie Wolf"
+date: "July 3, 2017"
 output: 
   html_document:
     keep_md: true
@@ -7,11 +9,49 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
+```{r setup, results="hide", message=FALSE, echo=TRUE}
+library(ggplot2)
+library(dplyr)
+unzip("activity.zip")
+activity <- read.csv("activity.csv")
+```
 
 ## What is mean total number of steps taken per day?
+```{r histogram, echo=TRUE,message=FALSE,warning=FALSE}
+## First let's aggregate the total steps per day using dplyr
+totalsteps<- activity %>% group_by(date) %>% summarize(steps = sum(steps))
 
+## Find the mean and median and assign to objects
+m <- as.integer(mean(totalsteps$steps,na.rm = TRUE))
+med <- median(totalsteps$steps,na.rm = TRUE)
+
+## Create a histogram with two vertical lines representing mean and median.
+h <- ggplot(totalsteps, aes(steps)) + 
+        geom_histogram(bins = 21) + 
+        ggtitle("Histogram of Daily Steps") +
+        geom_vline(xintercept = m, color = "blue") +
+        geom_vline(xintercept = med, color = "red") 
+h
+```
+
+####The average number of steps per day was `r m` and the median was `r med`. 
+
+Both the mean and median are shown on the histogram, but because they are very close together, they appear to make a solid line.
+
+To show the different between a histogram and a barplot, let's make another graph for the total steps for each day, for fun!
+
+####BONUS BARPLOT
+```{r dailysteps, warning=FALSE, echo=TRUE}
+g <- ggplot(totalsteps, aes(x=date,y=steps)) +
+        geom_bar(stat = "identity") +  ##Must use stat="identity" to force 2 variables
+        geom_hline(yintercept = m, color = "blue") +
+        geom_hline(yintercept = med, color = "red") +
+        theme(axis.text.x = element_text(angle=-90)) +
+        ggtitle("Total Steps per Day, Oct-Nov 2012") + xlab("Date") + ylab("Steps")
+g
+```
+
+I prefer the barplot when visualizing time-series data, but I see how the histogram helps in grouping if there is too much data.
 
 
 ## What is the average daily activity pattern?
