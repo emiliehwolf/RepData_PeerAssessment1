@@ -79,7 +79,7 @@ The histogram helps us group the data and view the distribution of totals, but s
 
 Let's make a barplot for the total steps from each day and see if there is a pattern of those outliers in the histogram.
 
-####BONUS BARPLOT (not part of assignment)
+#### BONUS BARPLOT (not part of assignment)
 
 ```r
 bb <- ggplot(totalsteps, aes(x=date,y=steps)) +
@@ -114,7 +114,7 @@ a
 
 ![](PA1_template_files/figure-html/linegraph-1.png)<!-- -->
 
-###Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
 ```r
