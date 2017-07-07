@@ -1,15 +1,11 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Emilie Wolf"
-date: "July 6, 2017"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Emilie Wolf  
+July 6, 2017  
 
 
 ## Loading and preprocessing the data
-```{r setup, results="hide", message=FALSE, echo=TRUE}
+
+```r
 ## Include packages, set globals, and import the data
 library(ggplot2)
 theme_set(theme_bw())
@@ -18,15 +14,37 @@ unzip("activity.zip")
 activity <- read.csv("activity.csv")
 ```
 
-```{r preview, echo=TRUE}
+
+```r
 ## Preview the data
 head(activity)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 
 ## What is the mean total number of steps taken per day?
-```{r histogram, echo=TRUE,message=FALSE,warning=FALSE}
+
+```r
 ## First let's aggregate the total steps per day using dplyr
 totalsteps <- activity %>% group_by(date) %>% summarize(steps = sum(steps))
 
@@ -41,20 +59,29 @@ h <- ggplot(totalsteps, aes(steps)) +
         geom_vline(xintercept = m, color = "blue") +
         geom_vline(xintercept = med, color = "red") 
 h
+```
 
+![](PA1_template_files/figure-html/histogram-1.png)<!-- -->
+
+```r
 print(c(m,med))
+```
+
+```
+## [1] 10766 10765
 ```
 
 Both the mean and median are shown on the above histogram, but because they are very close together, they appear to make a single line. 
 
-**The mean number of steps per day was `r m` and the median was `r med`.**
+**The mean number of steps per day was 10766 and the median was 10765.**
 
 The histogram helps us group the data and view the distribution of totals, but since we only have two months of activity, I would like to see the daily totals as a barplot.
 
 Let's make a barplot for the total steps from each day and see if there is a pattern of those outliers in the histogram.
 
 ####BONUS BARPLOT (not part of assignment)
-```{r dailysteps, warning=FALSE, echo=TRUE}
+
+```r
 bb <- ggplot(totalsteps, aes(x=date,y=steps)) +
         geom_bar(stat = "identity") +  ##Must use stat="identity" to force 2 variables
         geom_hline(yintercept = m, color = "blue") +
@@ -64,13 +91,16 @@ bb <- ggplot(totalsteps, aes(x=date,y=steps)) +
 bb
 ```
 
+![](PA1_template_files/figure-html/dailysteps-1.png)<!-- -->
+
 From the previous histogram, we saw there were 2 days with total steps unusually close to zero, but from this barplot, we see that there are quite a few days with missing data. Also, if there is a monthly or weekly pattern, it's not discernible yet. 
 
 Next question...
 
 
 ## What is the average daily activity pattern?
-```{r linegraph, echo=TRUE,message=FALSE,warning=FALSE}
+
+```r
 ## First we find the mean of each 5-minute interval across all days (dplyr)
 avgday <- activity %>% group_by(interval) %>% summarize(steps = mean(steps, na.rm=TRUE))
 
@@ -82,41 +112,52 @@ a <- ggplot(avgday, aes(x=interval,y=steps)) +
 a
 ```
 
+![](PA1_template_files/figure-html/linegraph-1.png)<!-- -->
+
 ###Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r echo=TRUE}
+
+```r
 ## Call the row index of the maximum value steps in an average day to see the corresponding interval
 avgday[which.max(avgday$steps),]
 ```
 
-```{r echo=F}
-maxint <-avgday[which.max(avgday$steps),]$interval
-x <- maxint*60
-
-maxtime <- paste(sprintf("%02d", floor(x / 3600)),
-      sprintf("%02d", floor(x %% 3600 / 60)),
-      sprintf("%02d", floor(x %% 60 )),
-      sep=":"
-)
 ```
-On average, the 5-minute interval with the most steps was interval **`r maxint`**, which is equivalent to the time **`r maxtime`**.
+## # A tibble: 1 × 2
+##   interval    steps
+##      <int>    <dbl>
+## 1      835 206.1698
+```
+
+
+On average, the 5-minute interval with the most steps was interval **835**, which is equivalent to the time **13:55:00**.
 
 ## Imputing missing values
 
 How much of the data is missing?
-```{r percent, echo=T}
+
+```r
 sum(!complete.cases(activity))/nrow(activity)
 ```
-```{r echo=F}
-p <- round(sum(!complete.cases(activity))/nrow(activity)*100)
+
 ```
-**Roughly `r p`% of the data is missing and needs imputing.**
-```{r nas impute, echo=TRUE}
+## [1] 0.1311475
+```
+
+**Roughly 13% of the data is missing and needs imputing.**
+
+```r
 ## Count NA's for each column
 colSums(is.na(activity))
 ```
 
-```{r impute, echo=T}
+```
+##    steps     date interval 
+##     2304        0        0
+```
+
+
+```r
 # Make a copy
 impu <- activity
 
@@ -129,13 +170,18 @@ for (i in 1:nrow(impu)){
 
 ## Make sure there are no more missing values
 colSums(is.na(impu))
+```
 
+```
+##    steps     date interval 
+##        0        0        0
 ```
 
 
 
 ### How does imputed data affect the averages and distribution of data?
-```{r imputedhistogram, echo=TRUE,message=FALSE,warning=FALSE}
+
+```r
 ## Aggregate the total steps per day (dplyr)
 itotalsteps<- impu %>% group_by(date) %>% summarize(steps = sum(steps))
 
@@ -150,8 +196,16 @@ h <- ggplot(itotalsteps, aes(steps)) +
         geom_vline(xintercept = m, color = "blue") +
         geom_vline(xintercept = med, color = "red") 
 h
+```
 
+![](PA1_template_files/figure-html/imputedhistogram-1.png)<!-- -->
+
+```r
 print(c(im,imed))
+```
+
+```
+## [1] 10766 10766
 ```
 
 It appears the mean and median are unaffected by this method of imputation. By comparison, the histogram here has a higher count of days close to the mean and median, but that was expected.
@@ -161,7 +215,8 @@ The mean has remained the same, and the medium has increased by 1.
 We will use this imputed data for the final question...
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r weekends, echo=T}
+
+```r
 ## We need to create another factor variable for weekday vs weekend.
 
 ## Extract the day of the week and assign to a placeholder column.
@@ -191,5 +246,7 @@ l <- ggplot(iavgday, aes(x=interval,y=steps)) +
         facet_wrap(~ day, ncol = 1) + theme(legend.position="none")
 l
 ```
+
+![](PA1_template_files/figure-html/weekends-1.png)<!-- -->
 
 **Thank you for reviewing my work! I hope everything was clear for the sake of learning!**
