@@ -91,15 +91,9 @@ avgday[which.max(avgday$steps),]
 
 ```{r echo=F}
 maxint <-avgday[which.max(avgday$steps),]$interval
-x <- maxint*60
-
-maxtime <- paste(sprintf("%02d", floor(x / 3600)),
-      sprintf("%02d", floor(x %% 3600 / 60)),
-      sprintf("%02d", floor(x %% 60 )),
-      sep=":"
 )
 ```
-On average, the 5-minute interval with the most steps was interval **`r maxint`**, which is equivalent to the time **`r maxtime`**.
+On average, the 5-minute interval with the most steps was interval **`r maxint`**, which is equivalent to the time **00:08:35**.
 
 ## Imputing missing values
 
