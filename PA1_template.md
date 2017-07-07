@@ -130,7 +130,7 @@ avgday[which.max(avgday$steps),]
 ```
 
 
-On average, the 5-minute interval with the most steps was interval **835**, which is equivalent to the time **13:55:00**.
+On average, the 5-minute interval with the most steps was interval **835**, which is equivalent to the time **08:35**.
 
 ## Imputing missing values
 
