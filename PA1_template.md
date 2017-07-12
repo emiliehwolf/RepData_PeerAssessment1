@@ -210,7 +210,7 @@ print(c(im,imed))
 
 It appears the mean and median are unaffected by this method of imputation. By comparison, the histogram here has a higher count of days close to the mean and median, but that was expected.
 
-The mean has remained the same, and the medium has increased by 1. 
+The mean has remained the same, and the median has increased by 1. 
 
 We will use this imputed data for the final question...
 
